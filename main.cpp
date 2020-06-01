@@ -45,6 +45,7 @@ int main(int argc, char** argv)
 
             case 5:
                 parser.encryptImage();
+                parser.refreshImageCRC(fileName);
                 break;
 
             default:

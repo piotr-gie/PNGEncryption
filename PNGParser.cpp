@@ -1,9 +1,11 @@
 #include "PNGParser.hpp"
 
+#include <stdlib.h>
 #include <cassert>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 void IDATChunk::print()
@@ -68,6 +70,15 @@ void PNGParser::readImageBytes()
     }
 }
 
+void PNGParser::refreshImageCRC(std::string imageName)
+{
+    std::string refreshImageCRCCommand;
+    refreshImageCRCCommand += "./refresh_crc " + imageName + " tmp.png ";
+    refreshImageCRCCommand += "&& mv tmp.png " + imageName;
+
+    system(refreshImageCRCCommand.c_str());
+}
+
 void PNGParser::parseImage()
 {
     imageData.size = imageBytes.size();
@@ -93,7 +104,6 @@ void PNGParser::encryptImage()
     }
 
     std::ofstream encryptedImage{fileName};
-    // std::ofstream encryptedImage{"encryptedImage.png"};
     for (auto byte: imageBytes) {
         encryptedImage << byte;
     }

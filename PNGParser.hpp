@@ -39,6 +39,7 @@ public:
     void parseImage();
     void encryptImage();
     void decryptImage();
+    void refreshImageCRC(std::string imageName_);
 
     void showImage();
     void printImageData();
