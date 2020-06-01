@@ -1,4 +1,4 @@
-# PNGParser
+# PNGEncryption
 
 ### Run
 * make
