@@ -1,4 +1,4 @@
-FLAGS= -Wall -pedantic -std=c++17 -iquote inc
+FLAGS= -Wall -pedantic -std=c++17 -iquote inc -lgmp -lgmpxx
 
 parser.out: main.o PNGParser.o
 	g++ ${FLAGS}  main.o PNGParser.o -o PNGParser

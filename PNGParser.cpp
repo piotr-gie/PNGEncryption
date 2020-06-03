@@ -1,10 +1,10 @@
 #include "PNGParser.hpp"
 
-#include <stdlib.h>
 #include <cassert>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <stdlib.h>
 #include <thread>
 #include <vector>
 
