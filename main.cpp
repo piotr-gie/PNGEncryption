@@ -6,7 +6,7 @@ void showMenu();
 
 int main(int argc, char** argv)
 {
-    const std::string defaultFileName{"PNGImages2/lena.png"};
+    const std::string defaultFileName{"tmp/lena.png"};
     std::string fileName{defaultFileName};
     if (argc > 1) {
         fileName = argv[1];
@@ -45,6 +45,12 @@ int main(int argc, char** argv)
 
             case 5:
                 parser.encryptImage();
+                std::cout << "Image has been encrypted" << std::endl;
+                break;
+
+            case 6:
+                parser.decryptImage();
+                std::cout << "Image has been decrypted" << std::endl;
                 break;
 
             default:
@@ -62,6 +68,7 @@ void showMenu()
     std::cout << "3 - show image" << std::endl;
     std::cout << "4 - show IDAT chunks" << std::endl;
     std::cout << "5 - encrypt image" << std::endl;
+    std::cout << "6 - decrypt image" << std::endl;
     std::cout << std::endl;
     std::cout << "0 - exit" << std::endl;
 }

@@ -89,19 +89,45 @@ void PNGEncryptor::parseImage()
 
 void PNGEncryptor::encryptBytes()
 {
+    std::vector<std::vector<unsigned int>> encryptedData = imageData.idat.data;
     for (std::size_t i = 0; i < imageData.idat.chunksSize.size(); i++) {
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
-            imageData.idat.data[i][j] = 255;
+            encryptedData[i][j] = 1;
+            for (int k = 0; k < encryptor.e; k++) {
+                encryptedData[i][j] = (encryptedData[i][j] * imageData.idat.data[i][j]) % encryptor.n;
+            }
         }
     }
+
+    std::ofstream of1{"beforeE"};
+    int row{1};
+    for (auto vec: imageData.idat.data) {
+        of1 << "Chunk " << row++ << " : " << std::endl;
+        for (auto chunk: vec) {
+            of1 << chunk << " ";
+        }
+    }
+    of1 << std::endl;
+
+    imageData.idat.data = encryptedData;
 
     for (std::size_t i = 0; i < imageData.idat.indice.size(); i++) {
         unsigned int index{imageData.idat.indice[i] + 4};
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
-            imageBytes[index] = imageData.idat.data[i][j];
+            imageBytes[index] = encryptedData[i][j];
             index++;
         }
     }
+
+    std::ofstream of2{"afterE"};
+    row = 1;
+    for (auto vec: encryptedData) {
+        of2 << "Chunk " << row++ << " : " << std::endl;
+        for (auto x: vec) {
+            of2 << x << " ";
+        }
+    }
+    of2 << std::endl;
 
     std::ofstream encryptedImage{fileName};
     for (auto byte: imageBytes) {
@@ -109,16 +135,64 @@ void PNGEncryptor::encryptBytes()
     }
 }
 
-
 void PNGEncryptor::encryptImage()
 {
     encryptBytes();
     refreshImageCRC();
 }
 
+void PNGEncryptor::decryptBytes()
+{
+    std::vector<std::vector<unsigned int>> decryptedData = imageData.idat.data;
+    for (std::size_t i = 0; i < imageData.idat.chunksSize.size(); i++) {
+        for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
+            decryptedData[i][j] = 1;
+            for (int k = 0; k < encryptor.key; k++) {
+                decryptedData[i][j] = (decryptedData[i][j] * imageData.idat.data[i][j]) % encryptor.n;
+            }
+        }
+    }
+
+    std::ofstream of1{"beforeD"};
+    int row{1};
+    for (auto vec: imageData.idat.data) {
+        of1 << "Chunk " << row++ << " : " << std::endl;
+        for (auto chunk: vec) {
+            of1 << chunk << " ";
+        }
+    }
+    of1 << std::endl;
+
+    imageData.idat.data = decryptedData;
+
+    for (std::size_t i = 0; i < imageData.idat.indice.size(); i++) {
+        unsigned int index{imageData.idat.indice[i] + 4};
+        for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
+            imageBytes[index] = decryptedData[i][j];
+            index++;
+        }
+    }
+
+    std::ofstream of2{"afterD"};
+    row = 1;
+    for (auto vec: decryptedData) {
+        of2 << "Chunk " << row++ << " : " << std::endl;
+        for (auto x: vec) {
+            of2 << x << " ";
+        }
+    }
+    of2 << std::endl;
+
+    std::ofstream decryptedImage{fileName};
+    for (auto byte: imageBytes) {
+        decryptedImage << byte;
+    }
+}
+
 void PNGEncryptor::decryptImage()
 {
-
+    decryptBytes();
+    refreshImageCRC();
 }
 
 void PNGEncryptor::readIHDR()
