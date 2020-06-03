@@ -11,8 +11,8 @@ struct IDATChunk
     int chunksNumber;
     std::vector<unsigned int> chunksSize;
     std::vector<unsigned int> indice;
-    std::vector<std::vector<unsigned int>> data;
-    std::vector<std::vector<mpz_class>> encryptedData;
+    std::vector<std::vector<mpz_class>> data;
+    // std::vector<std::vector<mpz_class>> encryptedData;
 
     void print();
     void printChunksSize();
@@ -34,56 +34,15 @@ struct ImageData
     IDATChunk idat;
 };
 
-
-
-/*
-    TO działa w osobnym pliku jak sie skompiluje:
-
-    std::vector<int> message = {'A', 'X'};
-    std::vector<int> cipher(message.size());
-
-    for (std::size_t i = 0; i < message.size(); i++) {
-        cipher[i] = 1;
-        for (int j = 0; j < e; j++) {
-            cipher[i] = (cipher[i] * message[i]) % n;
-        }
-    }
-
-
-    std::vector<int> result(message.size());
-    for (std::size_t i = 0; i < message.size(); i++) {
-        result[i] = 1;
-        for (int j = 0; j < key; j++) {
-            result[i] = (result[i] * cipher[i]) % n;
-        }
-    }
-
-    std::cout << "Message: ";
-    for (auto i : message) {
-        std::cout << i << ' ';
-    }
-    std::cout << std::endl;
-    std::cout << "Cipher: ";
-    for (auto i : cipher) {
-        std::cout << i << ' ';
-    }
-    std::cout << std::endl;
-    std::cout << "Result: ";
-    for (auto i : result) {
-        std::cout << i << ' ';
-    }
-    std::cout << std::endl;
-*/
-
 struct RSAEncryptor
 {
-    int p = 19;
-    int q = 17;
+    mpz_class p = 19;
+    mpz_class q = 17;
 
-    int n = p * q;
-    int e = 17;
+    mpz_class n = p * q;
+    mpz_class e = 17;
 
-    int key = ((p - 1) * (q - 1) + 1) / e;
+    mpz_class key = ((p - 1) * (q - 1) + 1) / e;
 };
 
 class PNGEncryptor

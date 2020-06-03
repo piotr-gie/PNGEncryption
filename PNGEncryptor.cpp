@@ -1,5 +1,7 @@
 #include "PNGEncryptor.hpp"
 
+#include <gmpxx.h>
+
 #include <cassert>
 #include <cmath>
 #include <fstream>
@@ -80,7 +82,7 @@ void PNGEncryptor::parseImage()
 
 void PNGEncryptor::encryptBytes()
 {
-    std::vector<std::vector<unsigned int>> encryptedData = imageData.idat.data;
+    std::vector<std::vector<mpz_class>> encryptedData = imageData.idat.data;
     for (std::size_t i = 0; i < imageData.idat.chunksSize.size(); i++) {
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
             encryptedData[i][j] = 1;
@@ -105,7 +107,7 @@ void PNGEncryptor::encryptBytes()
     for (std::size_t i = 0; i < imageData.idat.indice.size(); i++) {
         unsigned int index{imageData.idat.indice[i] + 4};
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
-            imageBytes[index] = encryptedData[i][j];// % 255;
+            imageBytes[index] = encryptedData[i][j].get_ui() % 255;
             index++;
         }
     }
@@ -134,7 +136,7 @@ void PNGEncryptor::encryptImage()
 
 void PNGEncryptor::decryptBytes()
 {
-    std::vector<std::vector<unsigned int>> decryptedData = imageData.idat.data;
+    std::vector<std::vector<mpz_class>> decryptedData = imageData.idat.data;
     for (std::size_t i = 0; i < imageData.idat.chunksSize.size(); i++) {
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
             decryptedData[i][j] = 1;
@@ -160,7 +162,7 @@ void PNGEncryptor::decryptBytes()
         unsigned int index{imageData.idat.indice[i] + 4};
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
             assert(decryptedData[i][j] <= 255);
-            imageBytes[index] = decryptedData[i][j];
+            imageBytes[index] = decryptedData[i][j].get_ui();
             index++;
         }
     }
@@ -232,7 +234,7 @@ void PNGEncryptor::readIDAT()
         idatLengths.push_back(idatLength);
     }
 
-    std::vector<std::vector<unsigned int>> idatData(idatIndice.size());
+    std::vector<std::vector<mpz_class>> idatData(idatIndice.size());
     for (std::size_t i = 0; i < idatIndice.size(); i++) {
         unsigned int index{idatIndice[i] + 4};
         for (std::size_t j = 0; j < idatLengths[i]; j++) {
