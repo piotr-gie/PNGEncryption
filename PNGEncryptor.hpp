@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gmpxx.h>
+
 #include <array>
 #include <string>
 #include <vector>
@@ -10,6 +12,7 @@ struct IDATChunk
     std::vector<unsigned int> chunksSize;
     std::vector<unsigned int> indice;
     std::vector<std::vector<unsigned int>> data;
+    std::vector<std::vector<mpz_class>> encryptedData;
 
     void print();
     void printChunksSize();

@@ -22,16 +22,6 @@ void IDATChunk::printChunksSize()
         std::cout << size << " ";
     }
     std::cout << "}" << std::endl;
-
-    // int row{1};
-    // std::cout << "IDAT data: " << std::endl;
-    // for (auto vec : idatData) {
-    //     std::cout << row << ": ";
-    //     for (auto byte : vec) {
-    //         std::cout << byte << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
 }
 
 void ImageData::printData()
