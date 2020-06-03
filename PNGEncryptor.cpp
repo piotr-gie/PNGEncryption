@@ -1,6 +1,7 @@
 #include "PNGEncryptor.hpp"
 
 #include <cassert>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -114,7 +115,7 @@ void PNGEncryptor::encryptBytes()
     for (std::size_t i = 0; i < imageData.idat.indice.size(); i++) {
         unsigned int index{imageData.idat.indice[i] + 4};
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
-            imageBytes[index] = encryptedData[i][j];
+            imageBytes[index] = encryptedData[i][j];// % 255;
             index++;
         }
     }
@@ -168,6 +169,7 @@ void PNGEncryptor::decryptBytes()
     for (std::size_t i = 0; i < imageData.idat.indice.size(); i++) {
         unsigned int index{imageData.idat.indice[i] + 4};
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
+            assert(decryptedData[i][j] <= 255);
             imageBytes[index] = decryptedData[i][j];
             index++;
         }

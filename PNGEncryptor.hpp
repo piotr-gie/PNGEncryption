@@ -74,11 +74,11 @@ struct ImageData
 
 struct RSAEncryptor
 {
-    int p = 11;
+    int p = 19;
     int q = 17;
 
     int n = p * q;
-    int e = 7;
+    int e = 17;
 
     int key = ((p - 1) * (q - 1) + 1) / e;
 };
