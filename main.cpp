@@ -1,4 +1,4 @@
-#include "PNGParser.hpp"
+#include "PNGEncryptor.hpp"
 
 #include <iostream>
 
@@ -12,7 +12,7 @@ int main(int argc, char** argv)
         fileName = argv[1];
     }
 
-    PNGParser parser{fileName};
+    PNGEncryptor parser{fileName};
 
     showMenu();
     int userInput{1};
@@ -45,7 +45,6 @@ int main(int argc, char** argv)
 
             case 5:
                 parser.encryptImage();
-                parser.refreshImageCRC(fileName);
                 break;
 
             default:
@@ -62,7 +61,7 @@ void showMenu()
     std::cout << "2 - show image data" << std::endl;
     std::cout << "3 - show image" << std::endl;
     std::cout << "4 - show IDAT chunks" << std::endl;
-    std::cout << "5 - create concatenated image" << std::endl;
+    std::cout << "5 - encrypt image" << std::endl;
     std::cout << std::endl;
     std::cout << "0 - exit" << std::endl;
 }

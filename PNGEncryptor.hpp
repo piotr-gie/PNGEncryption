@@ -31,15 +31,14 @@ struct ImageData
     IDATChunk idat;
 };
 
-class PNGParser
+class PNGEncryptor
 {
 public:
-    PNGParser(std::string fileName);
+    PNGEncryptor(std::string fileName);
 
     void parseImage();
     void encryptImage();
     void decryptImage();
-    void refreshImageCRC(std::string imageName_);
 
     void showImage();
     void printImageData();
@@ -55,6 +54,8 @@ private:
     unsigned int readNext4Bytes(unsigned int& index);
 
     void readImageBytes();
+    void encryptBytes();
+    void refreshImageCRC();
 
     unsigned int concatenate4Bytes(
         unsigned char b1,

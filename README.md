@@ -2,7 +2,7 @@
 
 ### Run
 * make
-* ./PNGParser png-file-name
+* ./PNGEncryptor png-file-name
 
 ### Authors
 Tomasz Filip,

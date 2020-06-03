@@ -1,4 +1,4 @@
-#include "PNGParser.hpp"
+#include "PNGEncryptor.hpp"
 
 #include <cassert>
 #include <fstream>
@@ -48,13 +48,13 @@ void ImageData::printData()
     idat.print();
 }
 
-PNGParser::PNGParser(std::string fileName_) : fileName{fileName_}
+PNGEncryptor::PNGEncryptor(std::string fileName_) : fileName{fileName_}
 {
     readImageBytes();
     parseImage();
 }
 
-void PNGParser::readImageBytes()
+void PNGEncryptor::readImageBytes()
 {
     std::ifstream image{fileName};
 
@@ -70,16 +70,16 @@ void PNGParser::readImageBytes()
     }
 }
 
-void PNGParser::refreshImageCRC(std::string imageName)
+void PNGEncryptor::refreshImageCRC()
 {
     std::string refreshImageCRCCommand;
-    refreshImageCRCCommand += "./refresh_crc " + imageName + " tmp.png ";
-    refreshImageCRCCommand += "&& mv tmp.png " + imageName;
+    refreshImageCRCCommand += "./refresh_crc " + fileName + " tmp.png ";
+    refreshImageCRCCommand += "&& mv tmp.png " + fileName;
 
     system(refreshImageCRCCommand.c_str());
 }
 
-void PNGParser::parseImage()
+void PNGEncryptor::parseImage()
 {
     imageData.size = imageBytes.size();
 
@@ -87,11 +87,11 @@ void PNGParser::parseImage()
     readIDAT();
 }
 
-void PNGParser::encryptImage()
+void PNGEncryptor::encryptBytes()
 {
     for (std::size_t i = 0; i < imageData.idat.chunksSize.size(); i++) {
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
-            imageData.idat.data[i][j] = 0;
+            imageData.idat.data[i][j] = 255;
         }
     }
 
@@ -109,12 +109,19 @@ void PNGParser::encryptImage()
     }
 }
 
-void PNGParser::decryptImage()
+
+void PNGEncryptor::encryptImage()
+{
+    encryptBytes();
+    refreshImageCRC();
+}
+
+void PNGEncryptor::decryptImage()
 {
 
 }
 
-void PNGParser::readIHDR()
+void PNGEncryptor::readIHDR()
 {
     unsigned int ihdrIndex{0};
     for (std::size_t i = 0; i < imageBytes.size() - 3; i++) {
@@ -142,7 +149,7 @@ void PNGParser::readIHDR()
     imageData.interlaceMethod = readNextByte(index);
 }
 
-void PNGParser::readIDAT()
+void PNGEncryptor::readIDAT()
 {
     std::vector<unsigned int> idatIndice;
     for (std::size_t i = 0; i < imageBytes.size() - 3; i++) {
@@ -174,14 +181,14 @@ void PNGParser::readIDAT()
     imageData.idat.data = idatData;
 }
 
-int PNGParser::readNextByte(unsigned int& index)
+int PNGEncryptor::readNextByte(unsigned int& index)
 {
     assert(index < imageBytes.size());
 
     return imageBytes[index++];
 }
 
-unsigned int PNGParser::readNext4Bytes(unsigned int& index)
+unsigned int PNGEncryptor::readNext4Bytes(unsigned int& index)
 {
     assert(index + 3 < imageBytes.size());
 
@@ -194,12 +201,12 @@ unsigned int PNGParser::readNext4Bytes(unsigned int& index)
     );
 }
 
-void PNGParser::printImageData()
+void PNGEncryptor::printImageData()
 {
     imageData.printData();
 }
 
-unsigned int PNGParser::concatenate4Bytes(
+unsigned int PNGEncryptor::concatenate4Bytes(
     unsigned char b1,
     unsigned char b2,
     unsigned char b3,
@@ -209,12 +216,12 @@ unsigned int PNGParser::concatenate4Bytes(
     return b1 << 24 | b2 << 16 | b3 << 8 | b4;
 }
 
-void PNGParser::printIDATChunks()
+void PNGEncryptor::printIDATChunks()
 {
     imageData.idat.printChunksSize();
 }
 
-void PNGParser::showImage()
+void PNGEncryptor::showImage()
 {
     std::string showImageCommand;
     showImageCommand += "xdg-open ";
