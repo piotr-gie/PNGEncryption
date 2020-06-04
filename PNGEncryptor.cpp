@@ -80,27 +80,32 @@ void PNGEncryptor::parseImage()
     readIDAT();
 }
 
+RSAEncryptor::RSAEncryptor():
+    e{generateE()},
+    key{generateKey()}
+{
+    mpz_class gcdResult = emedia::gcd(e, phi);
+    assert(gcdResult == 1);
+    gcdResult = emedia::gcd(mpz_class(key * e), phi);
+    assert(gcdResult == 1);
+}
+
 void PNGEncryptor::encryptBytes()
 {
     std::vector<std::vector<mpz_class>> encryptedData = imageData.idat.data;
     for (std::size_t i = 0; i < imageData.idat.chunksSize.size(); i++) {
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
-            encryptedData[i][j] = 1;
-            for (int k = 0; k < encryptor.e; k++) {
-                encryptedData[i][j] = (encryptedData[i][j] * imageData.idat.data[i][j]) % encryptor.n;
-            }
+            // encryptedData[i][j] = 1;
+            // for (int k = 0; k < encryptor.e; k++) {
+            //     encryptedData[i][j] = (encryptedData[i][j] * imageData.idat.data[i][j]) % encryptor.n;
+            // }
+            mpz_t encrypted;
+            mpz_init(encrypted);
+            mpz_powm(encrypted, imageData.idat.data[i][j].get_mpz_t(), encryptor.e.get_mpz_t(), encryptor.n.get_mpz_t());
+            mpz_class ciphers{encrypted};
+            encryptedData[i][j] = ciphers;
         }
     }
-
-    std::ofstream of1{"beforeE"};
-    int row{1};
-    for (auto vec: imageData.idat.data) {
-        of1 << "Chunk " << row++ << " : " << std::endl;
-        for (auto chunk: vec) {
-            of1 << chunk << " ";
-        }
-    }
-    of1 << std::endl;
 
     imageData.idat.data = encryptedData;
 
@@ -111,16 +116,6 @@ void PNGEncryptor::encryptBytes()
             index++;
         }
     }
-
-    std::ofstream of2{"afterE"};
-    row = 1;
-    for (auto vec: encryptedData) {
-        of2 << "Chunk " << row++ << " : " << std::endl;
-        for (auto x: vec) {
-            of2 << x << " ";
-        }
-    }
-    of2 << std::endl;
 
     std::ofstream encryptedImage{fileName};
     for (auto byte: imageBytes) {
@@ -139,22 +134,18 @@ void PNGEncryptor::decryptBytes()
     std::vector<std::vector<mpz_class>> decryptedData = imageData.idat.data;
     for (std::size_t i = 0; i < imageData.idat.chunksSize.size(); i++) {
         for (std::size_t j = 0; j < imageData.idat.chunksSize[i]; j++) {
-            decryptedData[i][j] = 1;
-            for (int k = 0; k < encryptor.key; k++) {
-                decryptedData[i][j] = (decryptedData[i][j] * imageData.idat.data[i][j]) % encryptor.n;
-            }
-        }
-    }
+            // decryptedData[i][j] = 1;
+            // for (int k = 0; k < encryptor.key; k++) {
+            //     decryptedData[i][j] = (decryptedData[i][j] * imageData.idat.data[i][j]) % encryptor.n;
+            // }
 
-    std::ofstream of1{"beforeD"};
-    int row{1};
-    for (auto vec: imageData.idat.data) {
-        of1 << "Chunk " << row++ << " : " << std::endl;
-        for (auto chunk: vec) {
-            of1 << chunk << " ";
+            mpz_t decrypted;
+            mpz_init(decrypted);
+            mpz_powm(decrypted,decryptedData[i][j].get_mpz_t(), encryptor.key.get_mpz_t(), encryptor.n.get_mpz_t());
+            mpz_class results{decrypted};
+            decryptedData[i][j]=results;
         }
     }
-    of1 << std::endl;
 
     imageData.idat.data = decryptedData;
 
@@ -166,16 +157,6 @@ void PNGEncryptor::decryptBytes()
             index++;
         }
     }
-
-    std::ofstream of2{"afterD"};
-    row = 1;
-    for (auto vec: decryptedData) {
-        of2 << "Chunk " << row++ << " : " << std::endl;
-        for (auto x: vec) {
-            of2 << x << " ";
-        }
-    }
-    of2 << std::endl;
 
     std::ofstream decryptedImage{fileName};
     for (auto byte: imageBytes) {
@@ -267,6 +248,16 @@ unsigned int PNGEncryptor::readNext4Bytes(unsigned int& index)
         imageBytes[index - 2],
         imageBytes[index - 1]
     );
+}
+
+mpz_class RSAEncryptor::generateE()
+{
+    return mpz_class{"170141183460469231731687303715884105727"};
+}
+
+mpz_class RSAEncryptor::generateKey()
+{
+    return mpz_class{"3657039001231255831864961573957761009700584565032147969753"};
 }
 
 void PNGEncryptor::printImageData()

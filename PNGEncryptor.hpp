@@ -6,13 +6,27 @@
 #include <string>
 #include <vector>
 
+namespace emedia {
+
+template<typename T>
+T gcd(T a, T b)
+{
+    if (a % b == 0) {
+        return b;
+    }
+    else {
+        return gcd(b, a % b);
+    }
+}
+
+} // namespace emedia
+
 struct IDATChunk
 {
     int chunksNumber;
     std::vector<unsigned int> chunksSize;
     std::vector<unsigned int> indice;
     std::vector<std::vector<mpz_class>> data;
-    // std::vector<std::vector<mpz_class>> encryptedData;
 
     void print();
     void printChunksSize();
@@ -36,13 +50,17 @@ struct ImageData
 
 struct RSAEncryptor
 {
-    mpz_class p = 19;
-    mpz_class q = 17;
+    RSAEncryptor();
+    mpz_class p{"162259276829213363391578010288127"}; // length: 34
+    mpz_class q{"618970019642690137449562111"}; // length: 28
 
+    mpz_class phi = (p - 1) * (q - 1);
     mpz_class n = p * q;
-    mpz_class e = 17;
+    mpz_class e;
+    mpz_class key;
 
-    mpz_class key = ((p - 1) * (q - 1) + 1) / e;
+    mpz_class generateE();
+    mpz_class generateKey();
 };
 
 class PNGEncryptor
