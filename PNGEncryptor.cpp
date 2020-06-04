@@ -11,6 +11,45 @@
 #include <thread>
 #include <vector>
 
+namespace emedia {
+
+mpz_class gcdExtended(mpz_class a, mpz_class b, mpz_class &x, mpz_class &y)
+{
+    // Base Case
+    if (a == 0) {
+        x = 0, y = 1;
+        return b;
+    }
+
+    mpz_class x1, y1; // To store results of recursive call
+    mpz_class gcd = gcdExtended(b % a, a, x1, y1);
+
+    // Update x and y using results of recursive
+    // call
+    x = y1 - (b/a) * x1;
+    y = x1;
+
+    return gcd;
+}
+
+// Function to find modulo inverse of a
+mpz_class modInverse(mpz_class a, mpz_class m)
+{
+    mpz_class x, y;
+    mpz_class g = gcdExtended(a, m, x, y);
+    if (g != 1) {
+        std::cout << "Inverse doesn't exist";
+         return -1;
+    }
+    else {
+        // m is added to handle negative x
+        mpz_class res = (x % m + m) % m;
+        return res;
+    }
+}
+
+}
+
 void IDATChunk::print()
 {
     std::cout << "Number of IDAT chunks: " << chunksNumber << std::endl;
@@ -252,12 +291,19 @@ unsigned int PNGEncryptor::readNext4Bytes(unsigned int& index)
 
 mpz_class RSAEncryptor::generateE()
 {
-    return mpz_class{"170141183460469231731687303715884105727"};
+    mpz_class generatedE = 3;
+    while (emedia::gcd(generatedE, phi) != 1) {
+        generatedE += 2;
+    }
+
+    return generatedE;
+    // return mpz_class{"170141183460469231731687303715884105727"};
 }
 
 mpz_class RSAEncryptor::generateKey()
 {
-    return mpz_class{"3657039001231255831864961573957761009700584565032147969753"};
+    return emedia::modInverse(e, phi);
+    // return mpz_class{"3657039001231255831864961573957761009700584565032147969753"};
 }
 
 void PNGEncryptor::printImageData()
